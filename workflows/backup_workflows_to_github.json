@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-02-02T10:37:53.829Z",
+  "updatedAt": "2026-02-02T10:38:17.142Z",
   "createdAt": "2026-02-02T10:24:36.325Z",
   "id": "ESuuXSI1OzvKIyGjneFq0",
   "name": "Backup Workflows to GitHub",
@@ -79,7 +79,13 @@
       "position": [
         1632,
         -112
-      ]
+      ],
+      "credentials": {
+        "githubApi": {
+          "id": "hmoppFynzUN7ewwd",
+          "name": "GitHub account"
+        }
+      }
     },
     {
       "parameters": {
@@ -99,7 +105,13 @@
       "position": [
         1840,
         -112
-      ]
+      ],
+      "credentials": {
+        "githubApi": {
+          "id": "hmoppFynzUN7ewwd",
+          "name": "GitHub account"
+        }
+      }
     }
   ],
   "connections": {
@@ -157,7 +169,7 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "d4fae704-4663-4b52-882d-59d036a7fdfd",
+  "versionId": "672748d4-8c12-45bc-8633-9b1d2ed3f394",
   "activeVersionId": null,
   "triggerCount": 0,
   "shared": [
