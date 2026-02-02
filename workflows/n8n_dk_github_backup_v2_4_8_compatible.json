@@ -1,0 +1,150 @@
+{
+  "updatedAt": "2026-02-02T10:23:28.052Z",
+  "createdAt": "2026-02-02T09:37:28.883Z",
+  "id": "RVyVSSUne5OaHsnb2aAxA",
+  "name": "n8n.dk → GitHub backup (v2.4.8 compatible)",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 3 * * *"
+            }
+          ]
+        }
+      },
+      "id": "78d4c82d-df43-4319-8e14-d1248ce5ea5d",
+      "name": "03:00 DK",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        1696,
+        -96
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://n8n.dakkedak.dk/api/v1/workflows",
+        "options": {},
+        "headerParametersUi": {
+          "parameter": [
+            {
+              "name": "X-N8N-API-KEY",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmYjI4Y2YwMi1kNDU5LTQ0ODAtYTNjNy02NTMyOWU4NmEzY2YiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzcwMDI2MDIzLCJleHAiOjE3Nzc3NTkyMDB9.BEx8WapjqGWtIWM98BJMnKhWqaqjInJzkfI29RkM8Kw"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        }
+      },
+      "id": "13be1c6e-aeff-4b2c-9fbd-b06714a33a97",
+      "name": "Get Workflows",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        1936,
+        -96
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "const workflows = items[0].json.data;\nreturn workflows.map(w => ({\n  json: {\n    path: 'workflows/' + w.name.replace(/[^\\w]/g,'_').toLowerCase() + '.json',\n    body: {\n      message: 'n8n backup: ' + w.name,\n      content: Buffer.from(JSON.stringify(w, null, 2)).toString('base64'),\n      branch: 'main'\n    }\n  }\n}));"
+      },
+      "id": "327f1a3a-3b35-4068-8bea-dfd63a699d64",
+      "name": "Format Workflows",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        2160,
+        -96
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "url": "=https://api.github.com/repos/tobiasdosdal/n8n-workflows/contents/{{ $json.path }}",
+        "jsonParameters": true,
+        "options": {}
+      },
+      "id": "40e69d19-a9f9-40e2-9f03-ffb2e532f437",
+      "name": "Create or Update File",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        2400,
+        -96
+      ],
+      "credentials": {
+        "githubApi": {
+          "id": "hmoppFynzUN7ewwd",
+          "name": "GitHub account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "03:00 DK": {
+      "main": [
+        [
+          {
+            "node": "Get Workflows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Workflows": {
+      "main": [
+        [
+          {
+            "node": "Format Workflows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Workflows": {
+      "main": [
+        [
+          {
+            "node": "Create or Update File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "5774743f-5e08-4606-a8f8-1ddf4eebb4f7",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-02-02T09:37:28.883Z",
+      "createdAt": "2026-02-02T09:37:28.883Z",
+      "role": "workflow:owner",
+      "workflowId": "RVyVSSUne5OaHsnb2aAxA",
+      "projectId": "yog61zFg90uVA3O8"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
