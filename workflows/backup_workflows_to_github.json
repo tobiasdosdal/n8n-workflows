@@ -1,0 +1,174 @@
+{
+  "updatedAt": "2026-02-02T10:37:53.829Z",
+  "createdAt": "2026-02-02T10:24:36.325Z",
+  "id": "ESuuXSI1OzvKIyGjneFq0",
+  "name": "Backup Workflows to GitHub",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 3 * * *"
+            }
+          ]
+        }
+      },
+      "id": "9047950b-f3f7-4b9c-8e8d-176bf4f7e3f7",
+      "name": "Daily 3AM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        960,
+        -112
+      ]
+    },
+    {
+      "parameters": {
+        "filters": {},
+        "requestOptions": {}
+      },
+      "id": "4f1c0c2e-0be1-4ea9-833f-f1244f664bc3",
+      "name": "Get All Workflows",
+      "type": "n8n-nodes-base.n8n",
+      "typeVersion": 1,
+      "position": [
+        1184,
+        -112
+      ],
+      "credentials": {
+        "n8nApi": {
+          "id": "Werq1pDvs1b9HkAp",
+          "name": "n8n account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const workflows = $input.all();\n\nreturn workflows.map(item => {\n  const wf = item.json;\n  const safeName = wf.name\n    .toLowerCase()\n    .replace(/[^a-z0-9]+/g, '_')\n    .replace(/^_|_$/g, '');\n  \n  return {\n    json: {\n      fileName: `workflows/${safeName}.json`,\n      content: Buffer.from(JSON.stringify(wf, null, 2)).toString('base64'),\n      commitMessage: `Backup: ${wf.name}`\n    }\n  };\n});"
+      },
+      "id": "2c727f73-611f-44af-bcdc-a47868331e83",
+      "name": "Format for GitHub",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1408,
+        -112
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://api.github.com/repos/tobiasdosdal/n8n-workflows/contents/{{ $json.fileName }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "1a23840f-0b75-42ee-a1ae-33111f97feb4",
+      "name": "Get Existing File",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1632,
+        -112
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://api.github.com/repos/tobiasdosdal/n8n-workflows/contents/{{ $('Format for GitHub').item.json.fileName }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ message: $('Format for GitHub').item.json.commitMessage, content: $('Format for GitHub').item.json.content, branch: 'main', sha: $json.sha || undefined }) }}",
+        "options": {}
+      },
+      "id": "d82f90ba-2f98-4548-8f7e-944edb52c856",
+      "name": "Push to GitHub",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1840,
+        -112
+      ]
+    }
+  ],
+  "connections": {
+    "Daily 3AM": {
+      "main": [
+        [
+          {
+            "node": "Get All Workflows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All Workflows": {
+      "main": [
+        [
+          {
+            "node": "Format for GitHub",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format for GitHub": {
+      "main": [
+        [
+          {
+            "node": "Get Existing File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Existing File": {
+      "main": [
+        [
+          {
+            "node": "Push to GitHub",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "d4fae704-4663-4b52-882d-59d036a7fdfd",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-02-02T10:24:36.325Z",
+      "createdAt": "2026-02-02T10:24:36.325Z",
+      "role": "workflow:owner",
+      "workflowId": "ESuuXSI1OzvKIyGjneFq0",
+      "projectId": "yog61zFg90uVA3O8"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
