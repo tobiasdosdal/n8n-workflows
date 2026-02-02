@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-02-02T10:38:17.142Z",
+  "updatedAt": "2026-02-02T10:40:11.512Z",
   "createdAt": "2026-02-02T10:24:36.325Z",
   "id": "ESuuXSI1OzvKIyGjneFq0",
   "name": "Backup Workflows to GitHub",
@@ -17,13 +17,13 @@
           ]
         }
       },
-      "id": "9047950b-f3f7-4b9c-8e8d-176bf4f7e3f7",
-      "name": "Daily 3AM",
+      "id": "47e366dd-1053-4904-86d5-2836784d77b5",
+      "name": "Daily 3AM1",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
       "position": [
-        960,
-        -112
+        1776,
+        112
       ]
     },
     {
@@ -31,13 +31,13 @@
         "filters": {},
         "requestOptions": {}
       },
-      "id": "4f1c0c2e-0be1-4ea9-833f-f1244f664bc3",
-      "name": "Get All Workflows",
+      "id": "6810d884-607e-4968-958e-bbffa6b0ae57",
+      "name": "Get All Workflows1",
       "type": "n8n-nodes-base.n8n",
       "typeVersion": 1,
       "position": [
-        1184,
-        -112
+        2000,
+        112
       ],
       "credentials": {
         "n8nApi": {
@@ -50,13 +50,13 @@
       "parameters": {
         "jsCode": "const workflows = $input.all();\n\nreturn workflows.map(item => {\n  const wf = item.json;\n  const safeName = wf.name\n    .toLowerCase()\n    .replace(/[^a-z0-9]+/g, '_')\n    .replace(/^_|_$/g, '');\n  \n  return {\n    json: {\n      fileName: `workflows/${safeName}.json`,\n      content: Buffer.from(JSON.stringify(wf, null, 2)).toString('base64'),\n      commitMessage: `Backup: ${wf.name}`\n    }\n  };\n});"
       },
-      "id": "2c727f73-611f-44af-bcdc-a47868331e83",
-      "name": "Format for GitHub",
+      "id": "55504d04-25c1-4630-9470-39b8322cd8f1",
+      "name": "Format for GitHub1",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1408,
-        -112
+        2224,
+        112
       ]
     },
     {
@@ -65,6 +65,12 @@
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "githubApi",
         "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 1,
+              "batchInterval": 500
+            }
+          },
           "response": {
             "response": {
               "neverError": true
@@ -72,87 +78,82 @@
           }
         }
       },
-      "id": "1a23840f-0b75-42ee-a1ae-33111f97feb4",
-      "name": "Get Existing File",
+      "id": "3f6e7b2f-9541-49c1-9a8b-106062bf84e4",
+      "name": "Get Existing File1",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1632,
-        -112
-      ],
-      "credentials": {
-        "githubApi": {
-          "id": "hmoppFynzUN7ewwd",
-          "name": "GitHub account"
-        }
-      }
+        2448,
+        112
+      ]
     },
     {
       "parameters": {
         "method": "PUT",
-        "url": "=https://api.github.com/repos/tobiasdosdal/n8n-workflows/contents/{{ $('Format for GitHub').item.json.fileName }}",
+        "url": "=https://api.github.com/repos/tobiasdosdal/n8n-workflows/contents/{{ $('Format for GitHub1').item.json.fileName }}",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "githubApi",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ message: $('Format for GitHub').item.json.commitMessage, content: $('Format for GitHub').item.json.content, branch: 'main', sha: $json.sha || undefined }) }}",
-        "options": {}
+        "jsonBody": "={{ JSON.stringify({ message: $('Format for GitHub1').item.json.commitMessage, content: $('Format for GitHub1').item.json.content, branch: 'main', sha: $json.sha || undefined }) }}",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 1,
+              "batchInterval": 500
+            }
+          }
+        }
       },
-      "id": "d82f90ba-2f98-4548-8f7e-944edb52c856",
-      "name": "Push to GitHub",
+      "id": "678560ad-cbee-4406-b674-32c39abae404",
+      "name": "Push to GitHub1",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1840,
-        -112
-      ],
-      "credentials": {
-        "githubApi": {
-          "id": "hmoppFynzUN7ewwd",
-          "name": "GitHub account"
-        }
-      }
+        2656,
+        112
+      ]
     }
   ],
   "connections": {
-    "Daily 3AM": {
+    "Daily 3AM1": {
       "main": [
         [
           {
-            "node": "Get All Workflows",
+            "node": "Get All Workflows1",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Get All Workflows": {
+    "Get All Workflows1": {
       "main": [
         [
           {
-            "node": "Format for GitHub",
+            "node": "Format for GitHub1",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Format for GitHub": {
+    "Format for GitHub1": {
       "main": [
         [
           {
-            "node": "Get Existing File",
+            "node": "Get Existing File1",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Get Existing File": {
+    "Get Existing File1": {
       "main": [
         [
           {
-            "node": "Push to GitHub",
+            "node": "Push to GitHub1",
             "type": "main",
             "index": 0
           }
@@ -169,7 +170,7 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "672748d4-8c12-45bc-8633-9b1d2ed3f394",
+  "versionId": "d6498f4b-d8d3-46e9-a713-b60ff0b22d91",
   "activeVersionId": null,
   "triggerCount": 0,
   "shared": [
